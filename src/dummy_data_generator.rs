@@ -2,7 +2,6 @@ use rand::{thread_rng, Rng};
 use std::collections::VecDeque;
 
 use eframe::egui;
-use egui::plot::Values;
 
 pub type DataPoint = eframe::egui::plot::Value;
 
@@ -47,6 +46,7 @@ impl SerialDataSingleLine {
         self.add_val(new_val);
     }
 
+    #[allow(unused)]
     pub fn clear(&mut self) {
         self.line = VecDeque::new();
         self.x_counter = 0;

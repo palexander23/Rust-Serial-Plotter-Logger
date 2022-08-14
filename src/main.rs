@@ -6,7 +6,6 @@ use std::thread;
 use std::time::Duration;
 
 use tracing::{debug, error, info, warn, Level};
-use tracing_subscriber;
 
 mod dummy_data_generator;
 mod plot_window;
@@ -27,8 +26,14 @@ fn main() {
 
     // Spin off a separate thread that will add new points to the line
     thread::spawn(move || loop {
-        line_data_ref.lock().unwrap().add_rand();
-        info!("Point added to line");
+        match line_data_ref.lock() {
+            Ok(mut line_data) => {
+                line_data.add_rand();
+                debug!("Point added to line");
+            }
+            Err(_) => error!("Could not get lock on line data!"),
+        };
+
         thread::sleep(Duration::from_millis(500));
     });
 

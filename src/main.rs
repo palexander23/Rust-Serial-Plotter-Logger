@@ -44,14 +44,24 @@ impl eframe::App for MyApp {
 
             // Plot window
             let sin = (0..1000).map(|i| {
-                let x = i as f64 * 0.01 * self.sin_incr as f64;
+                let x = i as f64 * 0.001 * self.sin_incr as f64;
                 Value::new(x, x.sin())
             });
 
+            let anti_sin = sin.clone().map(|val| {
+               Value::new(val.x, val.y * -1.0) 
+            });
+
             let line = Line::new(Values::from_values_iter(sin));
-            Plot::new("my_plot").view_aspect(2.0).show(ui, |plot_ui| plot_ui.line(line));
+            let anti_line = Line::new(Values::from_values_iter(anti_sin));
+            Plot::new("my_plot").view_aspect(2.0).show(ui, |plot_ui| {
+                plot_ui.line(line);
+                plot_ui.line(anti_line);
+            });
 
             self.sin_incr += 1;
         });
+
+        ctx.request_repaint();
     }
 }

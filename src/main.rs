@@ -1,65 +1,49 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+#![warn(clippy::unwrap_used)]
+#![warn(clippy::expect_used)]
 
-use eframe::egui;
-use egui::plot::{Line, Plot, Value, Values};
+use std::thread;
+use std::time::Duration;
+
+use tracing::{debug, error, info, warn, Level};
+
+mod dummy_data_generator;
+mod plot_window;
 
 fn main() {
-    let options = eframe::NativeOptions::default();
-    eframe::run_native(
-        "My egui App",
-        options,
-        Box::new(|_cc| Box::new(MyApp::default())),
-    );
-}
+    // Set up logging
+    tracing_subscriber::fmt()
+        .with_max_level(Level::TRACE)
+        .init();
 
-struct MyApp {
-    name: String,
-    age: u32,
-    sin_incr: u32,
-}
+    info!("Starting app...");
 
-impl Default for MyApp {
-    fn default() -> Self {
-        Self {
-            name: "Arthur".to_owned(),
-            age: 42,
-            sin_incr: 0,
-        }
-    }
-}
+    // Create an instance of the plot window
+    let plot_win = plot_window::PlotWindow::new();
 
-impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("My egui Application");
-            ui.horizontal(|ui| {
-                ui.label("Your name: ");
-                ui.text_edit_singleline(&mut self.name);
-            });
-            ui.add(egui::Slider::new(&mut self.age, 0..=120).text("age"));
-            if ui.button("Click each year").clicked() {
-                self.age += 1;
+    // Extract a pointer to the line data storage object
+    let line_data_ref = plot_win.line.clone();
+
+    // Spin off a separate thread that will add new points to the line
+    thread::spawn(move || loop {
+        match line_data_ref.lock() {
+            Ok(mut line_data) => {
+                line_data.add_rand();
+                debug!("Point added to line");
             }
-            ui.label(format!("Hello '{}', age {}", self.name, self.age));
+            Err(_) => error!("Could not get lock on line data!"),
+        };
 
-            // Plot window
-            let sin = (0..1000).map(|i| {
-                let x = i as f64 * 0.001 * self.sin_incr as f64;
-                Value::new(x, x.sin())
-            });
+        thread::sleep(Duration::from_millis(500));
+    });
 
-            let anti_sin = sin.clone().map(|val| Value::new(val.x, val.y * -1.0));
-
-            let line = Line::new(Values::from_values_iter(sin));
-            let anti_line = Line::new(Values::from_values_iter(anti_sin));
-            Plot::new("my_plot").view_aspect(2.0).show(ui, |plot_ui| {
-                plot_ui.line(line);
-                plot_ui.line(anti_line);
-            });
-
-            self.sin_incr += 1;
-        });
-
-        ctx.request_repaint();
-    }
+    // Start the egui thread.
+    // The program will not return from this!
+    info!("Main thread started");
+    let native_options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Serial Plotter/Logger",
+        native_options,
+        Box::new(|_cc| Box::new(plot_win)),
+    );
 }

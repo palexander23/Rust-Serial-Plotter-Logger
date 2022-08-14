@@ -12,6 +12,8 @@ pub struct SerialDataSingleLine {
 
     random_range_max: u32,
     random_range_min: u32,
+
+    x_lookback_len: usize,
 }
 
 impl SerialDataSingleLine {
@@ -23,6 +25,8 @@ impl SerialDataSingleLine {
 
             random_range_min: rand_min,
             random_range_max: rand_max,
+
+            x_lookback_len: 30,
         }
     }
 
@@ -35,6 +39,11 @@ impl SerialDataSingleLine {
 
         // Increment the x position
         self.x_counter += 1;
+
+        // Pop off some old values if we need to
+        while self.line.len() > self.x_lookback_len {
+            self.line.pop_front();
+        }
     }
 
     pub fn add_rand(&mut self) {

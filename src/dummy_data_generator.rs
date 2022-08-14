@@ -8,15 +8,15 @@ pub type DataPoint = eframe::egui::plot::Value;
 #[derive(Debug)]
 pub struct SerialDataSingleLine {
     line: VecDeque<DataPoint>,
-    x_counter: u64,
+    x_counter: u32,
 
-    random_range_max: u64,
-    random_range_min: u64,
+    random_range_max: u32,
+    random_range_min: u32,
 }
 
 impl SerialDataSingleLine {
     // Generate a new line with an empty window
-    pub fn new(rand_min: u64, rand_max: u64) -> Self {
+    pub fn new(rand_min: u32, rand_max: u32) -> Self {
         Self {
             line: VecDeque::new(),
             x_counter: 0,

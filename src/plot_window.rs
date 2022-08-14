@@ -33,7 +33,7 @@ impl eframe::App for PlotWindow {
 
             // Plot window
             let sin = (0..1000).map(|i| {
-                let x = i as f64 * 0.001 * self.sin_incr as f64;
+                let x = f64::from(i) * 0.001 * f64::from(self.sin_incr);
                 Value::new(x, x.sin())
             });
 

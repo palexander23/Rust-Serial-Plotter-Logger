@@ -1,4 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+#![warn(clippy::unwrap_used)]
+#![warn(clippy::expect_used)]
 
 mod dummy_data_generator;
 mod plot_window;

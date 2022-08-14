@@ -1,10 +1,13 @@
 use rand::{thread_rng, Rng};
 use std::collections::VecDeque;
 
+use eframe::egui;
+use egui::plot::Values;
+
 pub type DataPoint = eframe::egui::plot::Value;
 
 #[derive(Debug)]
-struct SerialDataSingleLine {
+pub struct SerialDataSingleLine {
     line: VecDeque<DataPoint>,
     x_counter: u64,
 
@@ -47,6 +50,10 @@ impl SerialDataSingleLine {
     pub fn clear(&mut self) {
         self.line = VecDeque::new();
         self.x_counter = 0;
+    }
+
+    pub fn get_plot_values(&self) -> egui::plot::Values {
+        egui::plot::Values::from_values_iter(self.line.iter().copied())
     }
 }
 

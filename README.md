@@ -1,5 +1,7 @@
 # Rust Serial Plotter/Logger (Plogger)
 
+## !!WIP: This app is under slow, irregular construction.
+
 A native app for simultaneously plotting and logging data gathered over Serial.
 
 ## Goals

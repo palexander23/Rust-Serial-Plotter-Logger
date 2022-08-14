@@ -15,7 +15,7 @@ fn main() {
 struct MyApp {
     name: String,
     age: u32,
-    sin_incr: u32
+    sin_incr: u32,
 }
 
 impl Default for MyApp {
@@ -48,9 +48,7 @@ impl eframe::App for MyApp {
                 Value::new(x, x.sin())
             });
 
-            let anti_sin = sin.clone().map(|val| {
-               Value::new(val.x, val.y * -1.0) 
-            });
+            let anti_sin = sin.clone().map(|val| Value::new(val.x, val.y * -1.0));
 
             let line = Line::new(Values::from_values_iter(sin));
             let anti_line = Line::new(Values::from_values_iter(anti_sin));

@@ -29,7 +29,9 @@ impl eframe::App for PlotWindow {
                     Plot::new("my_plot")
                         .show_axes([false, true])
                         .show(ui, |plot_ui| {
-                            plot_ui.line(egui::plot::Line::new(line_data.get_plot_values()));
+                            plot_ui.line(
+                                egui::plot::Line::new(line_data.get_plot_values()).width(2.0),
+                            );
                         });
                 }
                 Err(_) => error!("Could not get lock on line data!"),

@@ -8,21 +8,25 @@ pub type DataPoint = eframe::egui::plot::Value;
 #[derive(Debug)]
 pub struct SerialDataSingleLine {
     line: VecDeque<DataPoint>,
-    x_counter: u64,
+    x_counter: u32,
 
-    random_range_max: u64,
-    random_range_min: u64,
+    random_range_max: u32,
+    random_range_min: u32,
+
+    x_lookback_len: usize,
 }
 
 impl SerialDataSingleLine {
     // Generate a new line with an empty window
-    pub fn new(rand_min: u64, rand_max: u64) -> Self {
+    pub fn new(rand_min: u32, rand_max: u32) -> Self {
         Self {
             line: VecDeque::new(),
             x_counter: 0,
 
             random_range_min: rand_min,
             random_range_max: rand_max,
+
+            x_lookback_len: 30,
         }
     }
 
@@ -35,6 +39,11 @@ impl SerialDataSingleLine {
 
         // Increment the x position
         self.x_counter += 1;
+
+        // Pop off some old values if we need to
+        while self.line.len() > self.x_lookback_len {
+            self.line.pop_front();
+        }
     }
 
     pub fn add_rand(&mut self) {

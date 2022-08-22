@@ -9,6 +9,7 @@ use tracing::{debug, error, info, warn, Level};
 
 mod dummy_data_generator;
 mod plot_window;
+mod serial_comms;
 
 fn main() {
     // Set up logging
@@ -25,16 +26,14 @@ fn main() {
     let line_data_ref = plot_win.line.clone();
 
     // Spin off a separate thread that will add new points to the line
-    thread::spawn(move || loop {
-        match line_data_ref.lock() {
-            Ok(mut line_data) => {
-                line_data.add_rand();
-                debug!("Point added to line");
-            }
-            Err(_) => error!("Could not get lock on line data!"),
-        };
+    let mut serial_handler =
+        serial_comms::SerialHandler::new("/dev/ttyACM0", serial_comms::Baud::BAUD9600);
 
-        thread::sleep(Duration::from_millis(500));
+    thread::spawn(move || loop {
+        match serial_handler.process_serial_data() {
+            Some(n) => line_data_ref.lock().unwrap().add_val(n),
+            None => (),
+        }
     });
 
     // Start the egui thread.

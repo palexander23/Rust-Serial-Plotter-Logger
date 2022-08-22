@@ -26,7 +26,7 @@ impl SerialDataSingleLine {
             random_range_min: rand_min,
             random_range_max: rand_max,
 
-            x_lookback_len: 30,
+            x_lookback_len: 400,
         }
     }
 

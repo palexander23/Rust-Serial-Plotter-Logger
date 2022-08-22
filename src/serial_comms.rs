@@ -43,7 +43,7 @@ impl SerialHandler<'_> {
         }
     }
 
-    pub fn process_serial_data(&mut self) -> Option<i64> {
+    pub fn process_serial_data(&mut self) -> Option<String> {
         let mut read_buf: Vec<u8> = vec![0; 512];
         let mut bytes_read = 0;
 
@@ -80,16 +80,6 @@ impl SerialHandler<'_> {
 
         self.in_buffer.drain(0..=line_ending_idx);
 
-        // Attempt to convert value to number
-        match new_line_str.trim().parse() {
-            Ok(n) => {
-                info!("Received number: {}", n);
-                Some(n)
-            }
-            Err(_) => {
-                info!("String Received: {}", new_line_str);
-                return None;
-            }
-        }
+        Some(new_line_str)
     }
 }

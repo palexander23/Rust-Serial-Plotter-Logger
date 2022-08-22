@@ -4,16 +4,16 @@ use eframe::egui;
 use egui::plot::Plot;
 use tracing::error;
 
-use crate::dummy_data_generator::SerialDataSingleLine;
+use crate::multi_line::SerialDataMultiLine;
 
 pub struct PlotWindow {
-    pub line: Arc<Mutex<SerialDataSingleLine>>,
+    pub lines: Arc<Mutex<SerialDataMultiLine>>,
 }
 
 impl PlotWindow {
     pub fn new() -> Self {
         Self {
-            line: Arc::new(Mutex::new(SerialDataSingleLine::new(0, 20))),
+            lines: Arc::new(Mutex::new(SerialDataMultiLine::new())),
         }
     }
 }
@@ -24,17 +24,18 @@ impl eframe::App for PlotWindow {
             ui.heading("Serial Data");
 
             // Plot the values stored in the local line storage
-            match self.line.lock() {
-                Ok(line_data) => {
+            match self.lines.lock() {
+                Ok(lines) => {
                     Plot::new("my_plot")
                         .show_axes([false, true])
                         .show(ui, |plot_ui| {
                             plot_ui.line(
-                                egui::plot::Line::new(line_data.get_plot_values()).width(2.0),
+                                egui::plot::Line::new(lines.line_vec[0].get_plot_values())
+                                    .width(2.0),
                             );
                         });
                 }
-                Err(_) => error!("Could not get lock on line data!"),
+                Err(e) => error!("Could not get lock on line data: {:?}", e),
             };
         });
 

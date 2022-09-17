@@ -24,7 +24,7 @@ impl SerialDataMultiLine {
         let num_tokens = str_tokens.len();
 
         while self.line_count < num_tokens {
-            let prev_line = &mut self.line_vec[self.line_count];
+            let prev_line = &mut self.line_vec[self.line_count - 1];
 
             let current_x = prev_line.x();
             let current_lookback_len = prev_line.x_lookback_length();
@@ -48,5 +48,89 @@ impl SerialDataMultiLine {
         for (idx, val) in new_vals.iter().enumerate() {
             self.line_vec[idx].add_val(val.clone() as i64);
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+    use eframe::egui::plot::Values;
+
+    #[test]
+    fn test_new_multi_line_is_empty() {
+        // Define a new object to run the tests
+        let mut multiline_instance = SerialDataMultiLine::new();
+
+        // Assert that a single line already exists
+        assert!(multiline_instance.line_count == 1);
+
+        // Assert that the line is empty
+        let line_contents = multiline_instance.line_vec[0].get_vec();
+        assert_eq!(line_contents, vec![]);
+    }
+
+    #[test]
+    fn test_add_value_to_first_line() {
+        // Define a new object to run the tests
+        let mut multiline_instance = SerialDataMultiLine::new();
+
+        // Add a new value to the line
+        multiline_instance.add_new_data("1\n\r");
+
+        // Check that there is still only one line
+        assert_eq!(multiline_instance.line_count, 1);
+
+        // Check that the line has the new number in it
+        let line_contents = multiline_instance.line_vec[0].get_vec();
+        assert_eq!(line_contents, vec![1.0]);
+    }
+
+    #[test]
+    fn test_create_second_line() {
+        // Define a new object to run the tests
+        let mut multiline_instance = SerialDataMultiLine::new();
+
+        // Add a value to the first line
+        multiline_instance.add_new_data("1\n\r");
+
+        // Check that there is still only one line
+        assert_eq!(multiline_instance.line_count, 1);
+
+        // Send text with two values to process, forcing the creation of a second line
+        multiline_instance.add_new_data("1, 2\n\r");
+
+        // Check there are now two lines
+        assert_eq!(multiline_instance.line_count, 2);
+
+        // Get the two lines and check they have the correct values
+        let line_0_vec = multiline_instance.line_vec[0].get_vec();
+        let line_1_vec = multiline_instance.line_vec[1].get_vec();
+
+        assert_eq!(line_0_vec, vec![1.0, 1.0]);
+        assert_eq!(line_1_vec, vec![2.0]);
+    }
+
+    #[test]
+    fn test_add_three_lines_at_once() {
+        // Define a new object to run the tests
+        let mut multiline_instance = SerialDataMultiLine::new();
+
+        // Add new data
+        multiline_instance.add_new_data("1, 2, 3, 4\n\r");
+
+        // Check the line count is correct
+        assert_eq!(multiline_instance.line_count, 4);
+
+        // Check the line values are correct
+        let line_0_vec = multiline_instance.line_vec[0].get_vec();
+        let line_1_vec = multiline_instance.line_vec[1].get_vec();
+        let line_2_vec = multiline_instance.line_vec[2].get_vec();
+        let line_3_vec = multiline_instance.line_vec[3].get_vec();
+
+        assert_eq!(line_0_vec, vec![1.0]);
+        assert_eq!(line_1_vec, vec![2.0]);
+        assert_eq!(line_2_vec, vec![3.0]);
+        assert_eq!(line_3_vec, vec![4.0]);
     }
 }

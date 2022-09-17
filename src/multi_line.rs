@@ -83,7 +83,7 @@ mod test {
 
         // Check that the line has the new number in it
         let line_contents = multiline_instance.line_vec[0].get_vec();
-        assert_eq!(line_contents, vec![1.0]);
+        assert_eq!(line_contents, vec![(0.0, 1.0)]);
     }
 
     #[test]
@@ -107,8 +107,8 @@ mod test {
         let line_0_vec = multiline_instance.line_vec[0].get_vec();
         let line_1_vec = multiline_instance.line_vec[1].get_vec();
 
-        assert_eq!(line_0_vec, vec![1.0, 1.0]);
-        assert_eq!(line_1_vec, vec![2.0]);
+        assert_eq!(line_0_vec, vec![(0.0, 1.0), (1.0, 1.0)]);
+        assert_eq!(line_1_vec, vec![(1.0, 2.0)]);
     }
 
     #[test]
@@ -128,9 +128,9 @@ mod test {
         let line_2_vec = multiline_instance.line_vec[2].get_vec();
         let line_3_vec = multiline_instance.line_vec[3].get_vec();
 
-        assert_eq!(line_0_vec, vec![1.0]);
-        assert_eq!(line_1_vec, vec![2.0]);
-        assert_eq!(line_2_vec, vec![3.0]);
-        assert_eq!(line_3_vec, vec![4.0]);
+        assert_eq!(line_0_vec, vec![(0.0, 1.0)]);
+        assert_eq!(line_1_vec, vec![(0.0, 2.0)]);
+        assert_eq!(line_2_vec, vec![(0.0, 3.0)]);
+        assert_eq!(line_3_vec, vec![(0.0, 4.0)]);
     }
 }

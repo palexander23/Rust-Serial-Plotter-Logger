@@ -47,8 +47,8 @@ impl SerialDataSingleLine {
         egui::plot::Values::from_values_iter(self.line.iter().copied())
     }
 
-    pub fn get_vec(&self) -> Vec<f64> {
-        self.line.iter().map(|v| v.y).collect()
+    pub fn get_vec(&self) -> Vec<(f64, f64)> {
+        self.line.iter().map(|v| (v.x, v.y)).collect()
     }
 
     pub fn set_lookback_length(&mut self, new_lookback_len: usize) {

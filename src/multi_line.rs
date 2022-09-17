@@ -3,15 +3,19 @@ use crate::single_line::SerialDataSingleLine;
 pub struct SerialDataMultiLine {
     pub line_vec: Vec<SerialDataSingleLine>,
     line_count: usize,
+    x_counter: i32,
+    x_lookback_len: usize,
 }
 
 impl SerialDataMultiLine {
     pub fn new() -> Self {
-        let line_vec = vec![SerialDataSingleLine::new(0, 400)];
+        let line_vec = vec![SerialDataSingleLine::new()];
 
         Self {
             line_vec: line_vec,
             line_count: 1,
+            x_counter: 0,
+            x_lookback_len: 30,
         }
     }
 
@@ -23,23 +27,21 @@ impl SerialDataMultiLine {
         // number of line objects.
         let num_tokens = str_tokens.len();
 
-        while self.line_count < num_tokens {
-            let prev_line = &mut self.line_vec[self.line_count - 1];
-
-            let current_x = prev_line.x();
-            let current_lookback_len = prev_line.x_lookback_length();
-
-            let new_line = SerialDataSingleLine::new(current_x, current_lookback_len);
-            self.line_vec.push(new_line);
-
-            self.line_count += 1;
-        }
-
-        // Check if no new values were found
+        // Return if no new values were found to add to the line
         if str_tokens[0] == "" {
             return;
         }
 
+        // If there are more tokens than lines to generate more lines
+        while self.line_count < num_tokens {
+            let new_line = SerialDataSingleLine::new();
+
+            self.line_vec.push(new_line);
+            self.line_count += 1;
+        }
+
+        // Trim each tocken and remove any empty tokens
+        // TODO: Remove all non-numerical characters from each token
         let new_vals: Vec<i32> = str_tokens
             .iter()
             .map(|s| s.trim())
@@ -47,9 +49,20 @@ impl SerialDataMultiLine {
             .map(|s| s.parse().expect("Could not parse!"))
             .collect();
 
+        // Place the parsed numbers into the respective line
         for (idx, val) in new_vals.iter().enumerate() {
-            self.line_vec[idx].add_val(val.clone() as i64);
+            self.line_vec[idx].add_val(val.clone() as i64, self.x_counter);
         }
+
+        // Prune the values in each line that have fallen behind the x look back.
+        let x_cutoff = self.x_counter - self.x_lookback_len as i32;
+
+        for idx in 0..self.line_count {
+            self.line_vec[idx].prune_beyond_x_lookback(x_cutoff);
+        }
+
+        // Increment the x counter
+        self.x_counter += 1;
     }
 }
 

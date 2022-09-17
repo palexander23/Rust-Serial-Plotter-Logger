@@ -73,8 +73,6 @@ impl SerialHandler<'_> {
             .expect("Could not find newline character!");
 
         let new_line_chars = &self.in_buffer[0..=line_ending_idx];
-        debug!("New Line Chars: {:?}", new_line_chars);
-
         let new_line_str: String = new_line_chars.iter().cloned().collect();
         debug!("New Line String: {:?}", new_line_str);
 

@@ -42,7 +42,9 @@ impl SerialDataMultiLine {
 
         let new_vals: Vec<i32> = str_tokens
             .iter()
-            .map(|s| s.trim().parse().expect("Could not parse!"))
+            .map(|s| s.trim())
+            .filter(|s| s != &"")
+            .map(|s| s.parse().expect("Could not parse!"))
             .collect();
 
         for (idx, val) in new_vals.iter().enumerate() {

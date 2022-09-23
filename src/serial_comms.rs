@@ -1,31 +1,27 @@
 use serialport::SerialPort;
 use std::io::ErrorKind;
 use std::time::Duration;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 pub enum Baud {
     BAUD9600 = 9600,
-    BAUD115200 = 115200,
 }
 
 impl Into<u32> for Baud {
     fn into(self) -> u32 {
         match self {
             Baud::BAUD9600 => 9600,
-            Baud::BAUD115200 => 115_200,
         }
     }
 }
 
-pub struct SerialHandler<'a> {
+pub struct SerialHandler {
     port_handle: Box<dyn serialport::SerialPort>,
 
     in_buffer: Box<Vec<char>>,
-
-    deliminator: Box<&'a str>,
 }
 
-impl SerialHandler<'_> {
+impl SerialHandler {
     pub fn new(port_name: &str, baud: Baud) -> Self {
         let new_port_handle = serialport::new(port_name.clone(), baud.into())
             .timeout(Duration::from_millis(1000))
@@ -39,7 +35,6 @@ impl SerialHandler<'_> {
         Self {
             port_handle: Box::new(new_port_handle),
             in_buffer: Box::new(vec![]),
-            deliminator: Box::new(""),
         }
     }
 

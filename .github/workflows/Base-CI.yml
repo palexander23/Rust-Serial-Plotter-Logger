@@ -36,7 +36,4 @@ jobs:
     - name: Check Format
       run: cargo fmt --check
 
-    - name: Lint
-      run: cargo clippy -- -D warnings
-
     - uses: Swatinem/rust-cache@v1

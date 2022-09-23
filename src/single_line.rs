@@ -1,5 +1,4 @@
 use std::collections::VecDeque;
-use tracing::debug;
 
 use eframe::egui;
 

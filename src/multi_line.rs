@@ -12,7 +12,7 @@ impl SerialDataMultiLine {
         let line_vec = vec![SerialDataSingleLine::new()];
 
         Self {
-            line_vec: line_vec,
+            line_vec,
             line_count: 1,
             x_counter: 0,
             x_lookback_len: 30,
@@ -70,7 +70,6 @@ impl SerialDataMultiLine {
 mod test {
 
     use super::*;
-    use eframe::egui::plot::Values;
 
     #[test]
     fn test_new_multi_line_is_empty() {

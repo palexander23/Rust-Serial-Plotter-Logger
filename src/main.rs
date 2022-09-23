@@ -2,13 +2,14 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
-use std::thread;
-use std::time::Duration;
+use std::{thread, time::Duration};
 
-use tracing::{debug, error, info, warn, Level};
+use tracing::{info, warn, Level};
 
-mod dummy_data_generator;
+mod multi_line;
 mod plot_window;
+mod serial_comms;
+mod single_line;
 
 fn main() {
     // Set up logging
@@ -22,19 +23,19 @@ fn main() {
     let plot_win = plot_window::PlotWindow::new();
 
     // Extract a pointer to the line data storage object
-    let line_data_ref = plot_win.line.clone();
+    let line_data_ref = plot_win.lines.clone();
 
     // Spin off a separate thread that will add new points to the line
-    thread::spawn(move || loop {
-        match line_data_ref.lock() {
-            Ok(mut line_data) => {
-                line_data.add_rand();
-                debug!("Point added to line");
-            }
-            Err(_) => error!("Could not get lock on line data!"),
-        };
+    let mut serial_handler =
+        serial_comms::SerialHandler::new("/dev/ttyACM0", serial_comms::Baud::BAUD9600);
 
-        thread::sleep(Duration::from_millis(500));
+    thread::spawn(move || loop {
+        match serial_handler.process_serial_data() {
+            Some(new_str) => line_data_ref.lock().unwrap().add_new_data(new_str.as_str()),
+            None => (),
+        }
+
+        std::thread::sleep(Duration::from_millis(10));
     });
 
     // Start the egui thread.

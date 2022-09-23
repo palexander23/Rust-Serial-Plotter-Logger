@@ -2,14 +2,14 @@ name: Rust Build and Test
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
       - feature/*
-      - bugfix/* 
+      - bugfix/*
 
   pull_request:
-    branches: 
+    branches:
       - main
       - develop
 
@@ -24,16 +24,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install Dependancies
+      run: sudo apt update && sudo apt install -y libudev-dev
+
     - name: Build
       run: cargo build
 
     - name: Run tests
-      run: cargo test 
+      run: cargo test
 
     - name: Check Format
       run: cargo fmt --check
-
-    - name: Lint 
-      run: cargo clippy -- -D warnings
 
     - uses: Swatinem/rust-cache@v1

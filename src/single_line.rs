@@ -34,7 +34,7 @@ impl SerialDataSingleLine {
         while self.line.front().expect("Could not get line front").x < x_cutoff as f64 {
             self.line.pop_front();
 
-            if self.line.len() == 0{
+            if self.line.len() == 0 {
                 return;
             }
         }

@@ -12,3 +12,10 @@ color-eyre = "0.6.2"
 tracing = "0.1.36"
 tracing-subscriber = "0.3"
 serialport = "4.2.0"
+
+[features]
+default = ["real-serial-comms"]
+fake-build = ["fake-serial-comms"]
+
+real-serial-comms = []
+fake-serial-comms = []

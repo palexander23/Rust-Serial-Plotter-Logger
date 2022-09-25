@@ -8,8 +8,13 @@ use tracing::{info, warn, Level};
 
 mod multi_line;
 mod plot_window;
-mod serial_comms;
 mod single_line;
+
+#[cfg(feature = "real-serial-comms")]
+mod serial_comms;
+
+#[cfg(feature = "fake-serial-comms")]
+mod fake_serial_comms;
 
 fn main() {
     // Set up logging
@@ -26,8 +31,12 @@ fn main() {
     let line_data_ref = plot_win.lines.clone();
 
     // Spin off a separate thread that will add new points to the line
+    #[cfg(feature = "real-serial-comms")]
     let mut serial_handler =
         serial_comms::SerialHandler::new("/dev/ttyACM0", serial_comms::Baud::BAUD9600);
+
+    #[cfg(feature = "fake-serial-comms")]
+    let mut serial_handler = fake_serial_comms::FakeSerialHandler::new();
 
     thread::spawn(move || loop {
         match serial_handler.process_serial_data() {

@@ -1,5 +1,5 @@
-use eframe::egui::{self, CentralPanel, Layout};
-use eframe::emath::Align;
+use eframe::egui::{self, CentralPanel};
+use egui_extras::{Size, StripBuilder};
 
 pub(crate) mod plot_pane;
 
@@ -34,14 +34,40 @@ impl eframe::App for MainWindow {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Define central display area for MainWindow
         CentralPanel::default().show(ctx, |ui| {
-            ui.with_layout(Layout::top_down(Align::TOP), |ui| {
-                ui.with_layout(Layout::left_to_right(Align::LEFT), |ui| {
-                    self.serial_settings_pane.update(ui);
-                    self.log_settings_pane.update(ui);
+            StripBuilder::new(ui)
+                .size(Size::relative(0.1).at_least(80.0))
+                .size(Size::relative(0.1).at_least(80.0))
+                .size(Size::remainder())
+                .vertical(|mut strip| {
+                    strip.strip(|builder| {
+                        builder
+                            .size(Size::relative(0.5).at_least(200.0))
+                            .size(Size::remainder())
+                            .horizontal(|mut strip| {
+                                strip.cell(|ui| {
+                                    self.serial_settings_pane.update(ui);
+                                });
+                                strip.cell(|ui| {
+                                    self.log_settings_pane.update(ui);
+                                });
+                            });
+                    });
+
+                    strip.strip(|builder| {
+                        builder.size(Size::relative(1.0)).horizontal(|mut strip| {
+                            strip.cell(|ui| {
+                                self.plot_settings_pane.update(ui);
+                            });
+                        });
+                    });
+                    strip.strip(|builder| {
+                        builder.size(Size::relative(1.0)).horizontal(|mut strip| {
+                            strip.cell(|ui| {
+                                self.plot_pane.update(ui);
+                            });
+                        });
+                    });
                 });
-                self.plot_settings_pane.update(ui);
-                self.plot_pane.update(ui);
-            });
         });
 
         ctx.request_repaint();

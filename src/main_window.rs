@@ -35,7 +35,7 @@ impl eframe::App for MainWindow {
         // Define central display area for MainWindow
         CentralPanel::default().show(ctx, |ui| {
             StripBuilder::new(ui)
-                .size(Size::relative(0.1).at_least(80.0))
+                .size(Size::relative(0.1).at_least(100.0))
                 .size(Size::relative(0.1).at_least(80.0))
                 .size(Size::remainder())
                 .vertical(|mut strip| {
@@ -60,6 +60,7 @@ impl eframe::App for MainWindow {
                             });
                         });
                     });
+
                     strip.strip(|builder| {
                         builder.size(Size::relative(1.0)).horizontal(|mut strip| {
                             strip.cell(|ui| {

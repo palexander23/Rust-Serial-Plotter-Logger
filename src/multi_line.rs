@@ -74,13 +74,13 @@ mod test {
     #[test]
     fn test_new_multi_line_is_empty() {
         // Define a new object to run the tests
-        let mut multiline_instance = SerialDataMultiLine::new();
+        let multiline_instance = SerialDataMultiLine::new();
 
         // Assert that a single line already exists
         assert!(multiline_instance.line_count == 1);
 
         // Assert that the line is empty
-        let line_contents = multiline_instance.line_vec[0].get_vec();
+        let line_contents = multiline_instance.line_vec[0]._get_vec();
         assert_eq!(line_contents, vec![]);
     }
 
@@ -96,7 +96,7 @@ mod test {
         assert_eq!(multiline_instance.line_count, 1);
 
         // Check that the line has the new number in it
-        let line_contents = multiline_instance.line_vec[0].get_vec();
+        let line_contents = multiline_instance.line_vec[0]._get_vec();
         assert_eq!(line_contents, vec![(0.0, 1.0)]);
     }
 
@@ -118,8 +118,8 @@ mod test {
         assert_eq!(multiline_instance.line_count, 2);
 
         // Get the two lines and check they have the correct values
-        let line_0_vec = multiline_instance.line_vec[0].get_vec();
-        let line_1_vec = multiline_instance.line_vec[1].get_vec();
+        let line_0_vec = multiline_instance.line_vec[0]._get_vec();
+        let line_1_vec = multiline_instance.line_vec[1]._get_vec();
 
         assert_eq!(line_0_vec, vec![(0.0, 1.0), (1.0, 1.0)]);
         assert_eq!(line_1_vec, vec![(1.0, 2.0)]);
@@ -137,10 +137,10 @@ mod test {
         assert_eq!(multiline_instance.line_count, 4);
 
         // Check the line values are correct
-        let line_0_vec = multiline_instance.line_vec[0].get_vec();
-        let line_1_vec = multiline_instance.line_vec[1].get_vec();
-        let line_2_vec = multiline_instance.line_vec[2].get_vec();
-        let line_3_vec = multiline_instance.line_vec[3].get_vec();
+        let line_0_vec = multiline_instance.line_vec[0]._get_vec();
+        let line_1_vec = multiline_instance.line_vec[1]._get_vec();
+        let line_2_vec = multiline_instance.line_vec[2]._get_vec();
+        let line_3_vec = multiline_instance.line_vec[3]._get_vec();
 
         assert_eq!(line_0_vec, vec![(0.0, 1.0)]);
         assert_eq!(line_1_vec, vec![(0.0, 2.0)]);

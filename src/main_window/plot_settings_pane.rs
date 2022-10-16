@@ -20,14 +20,17 @@ impl PlotSettingsPane {
         ui.group(|ui| {
             ui.with_layout(Layout::top_down_justified(Align::LEFT), |ui| {
                 ui.heading("Plot Settings");
-                ui.horizontal(|ui| {
-                    ui.label("thing");
-                    ui.add(egui::TextEdit::singleline(&mut self.text1).hint_text("Text One"));
-                });
-                ui.horizontal(|ui| {
-                    ui.label("thing2");
-                    ui.add(egui::TextEdit::singleline(&mut self.text2).hint_text("Text Two"));
-                });
+                egui::Grid::new("Plot Settings Grid")
+                    .num_columns(2)
+                    .show(ui, |ui| {
+                        ui.label("thing");
+                        ui.add(egui::TextEdit::singleline(&mut self.text1).hint_text("Text One"));
+                        ui.end_row();
+
+                        ui.label("thing2");
+                        ui.add(egui::TextEdit::singleline(&mut self.text2).hint_text("Text Two"));
+                        ui.end_row();
+                    });
             });
         });
     }

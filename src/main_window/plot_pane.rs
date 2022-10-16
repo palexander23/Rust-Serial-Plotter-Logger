@@ -6,24 +6,21 @@ use tracing::error;
 
 use crate::multi_line::SerialDataMultiLine;
 
-pub struct PlotWindow {
+pub struct PlotPane {
     pub lines: Arc<Mutex<SerialDataMultiLine>>,
 }
 
-impl PlotWindow {
+impl PlotPane {
     pub fn new() -> Self {
         Self {
             lines: Arc::new(Mutex::new(SerialDataMultiLine::new())),
         }
     }
-}
 
-impl eframe::App for PlotWindow {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Serial Data");
-
-            // Plot the values stored in the local line storage
+    pub fn update(&mut self, ui: &mut egui::Ui) {
+        // Plot the values stored in the local line storage
+        ui.group(|ui| {
+            ui.heading("Serial Plot");
             match self.lines.lock() {
                 Ok(lines) => {
                     // Process the stored plot values into lines to be plotted
@@ -45,7 +42,5 @@ impl eframe::App for PlotWindow {
                 Err(e) => error!("Could not get lock on line data: {:?}", e),
             };
         });
-
-        ctx.request_repaint();
     }
 }

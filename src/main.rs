@@ -6,8 +6,8 @@ use std::{thread, time::Duration};
 
 use tracing::{info, warn, Level};
 
+mod main_window;
 mod multi_line;
-mod plot_window;
 mod single_line;
 
 #[cfg(feature = "real-serial-comms")]
@@ -25,10 +25,10 @@ fn main() {
     info!("Starting app...");
 
     // Create an instance of the plot window
-    let plot_win = plot_window::PlotWindow::new();
+    let main_win = main_window::MainWindow::new();
 
     // Extract a pointer to the line data storage object
-    let line_data_ref = plot_win.lines.clone();
+    let line_data_ref = main_win.plot_pane.lines.clone();
 
     // Spin off a separate thread that will add new points to the line
     #[cfg(feature = "real-serial-comms")]
@@ -54,6 +54,6 @@ fn main() {
     eframe::run_native(
         "Serial Plotter/Logger",
         native_options,
-        Box::new(|_cc| Box::new(plot_win)),
+        Box::new(|_cc| Box::new(main_win)),
     );
 }

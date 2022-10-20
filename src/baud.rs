@@ -1,3 +1,6 @@
+use strum::EnumIter;
+
+#[derive(Debug, EnumIter, Clone, Copy)]
 pub enum Baud {
     BAUD110 = 110,
     BAUD300 = 300,
@@ -18,5 +21,11 @@ pub enum Baud {
 impl Into<u32> for Baud {
     fn into(self) -> u32 {
         return self as u32;
+    }
+}
+
+impl Into<String> for Baud {
+    fn into(self) -> String {
+        return (self as u32).to_string();
     }
 }

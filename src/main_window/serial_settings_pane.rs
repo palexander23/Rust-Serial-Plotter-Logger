@@ -3,8 +3,9 @@ use eframe::{
     emath::Align,
 };
 use serialport;
+use strum::{EnumIter, IntoEnumIterator};
 
-use crate::baud::Baud;
+use crate::baud::{self, Baud};
 
 pub struct SerialSettingsPane {
     text1: String,
@@ -29,6 +30,10 @@ impl SerialSettingsPane {
 
         let mut selected_port_name_idx: usize = 0;
 
+        // Get list of possible Baud Rates
+        let baud_rates: Vec<_> = Baud::iter().collect();
+        let mut selected_baud_rate_idx = 0;
+
         ui.group(|ui| {
             ui.with_layout(
                 Layout::top_down(Align::LEFT).with_cross_justify(true),
@@ -47,9 +52,9 @@ impl SerialSettingsPane {
 
                             egui::ComboBox::from_label("Baud Rate").show_index(
                                 ui,
-                                &mut selected_port_name_idx,
-                                available_port_names.len(),
-                                |i| available_port_names[i].to_owned(),
+                                &mut selected_baud_rate_idx,
+                                baud_rates.len(),
+                                |i| baud_rates[i].into(),
                             );
                             ui.end_row();
                         });

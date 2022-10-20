@@ -2,6 +2,7 @@ use eframe::{
     egui::{self, Layout},
     emath::Align,
 };
+use serialport;
 
 pub struct SerialSettingsPane {
     text1: String,
@@ -17,6 +18,15 @@ impl SerialSettingsPane {
     }
 
     pub fn update(&mut self, ui: &mut egui::Ui) {
+        // Get list of available serial port names
+        let available_port_names: Vec<String> = serialport::available_ports()
+            .unwrap()
+            .iter()
+            .map(|s| s.port_name.clone())
+            .collect();
+
+        let mut selected_port_name_idx: usize = 0;
+
         ui.group(|ui| {
             ui.with_layout(
                 Layout::top_down(Align::LEFT).with_cross_justify(true),
@@ -25,9 +35,12 @@ impl SerialSettingsPane {
                     egui::Grid::new("Serial Settings Grid")
                         .num_columns(2)
                         .show(ui, |ui| {
-                            ui.label("thing");
-                            ui.add(
-                                egui::TextEdit::singleline(&mut self.text1).hint_text("Text One"),
+                            ui.label("Serial Port");
+                            egui::ComboBox::from_label("").show_index(
+                                ui,
+                                &mut selected_port_name_idx,
+                                available_port_names.len(),
+                                |i| available_port_names[i].to_owned(),
                             );
                             ui.end_row();
 

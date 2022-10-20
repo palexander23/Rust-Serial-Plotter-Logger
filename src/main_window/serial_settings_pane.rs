@@ -4,6 +4,8 @@ use eframe::{
 };
 use serialport;
 
+use crate::baud::Baud;
+
 pub struct SerialSettingsPane {
     text1: String,
     text2: String,
@@ -35,8 +37,7 @@ impl SerialSettingsPane {
                     egui::Grid::new("Serial Settings Grid")
                         .num_columns(2)
                         .show(ui, |ui| {
-                            ui.label("Serial Port");
-                            egui::ComboBox::from_label("").show_index(
+                            egui::ComboBox::from_label("Serial Port").show_index(
                                 ui,
                                 &mut selected_port_name_idx,
                                 available_port_names.len(),
@@ -44,9 +45,11 @@ impl SerialSettingsPane {
                             );
                             ui.end_row();
 
-                            ui.label("thing2");
-                            ui.add(
-                                egui::TextEdit::singleline(&mut self.text2).hint_text("Text Two"),
+                            egui::ComboBox::from_label("Baud Rate").show_index(
+                                ui,
+                                &mut selected_port_name_idx,
+                                available_port_names.len(),
+                                |i| available_port_names[i].to_owned(),
                             );
                             ui.end_row();
                         });

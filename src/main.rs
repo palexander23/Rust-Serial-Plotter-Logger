@@ -6,6 +6,7 @@ use std::{thread, time::Duration};
 
 use tracing::{info, warn, Level};
 
+mod baud;
 mod main_window;
 mod multi_line;
 mod single_line;

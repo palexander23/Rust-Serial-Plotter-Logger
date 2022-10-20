@@ -3,17 +3,7 @@ use std::io::ErrorKind;
 use std::time::Duration;
 use tracing::{debug, error};
 
-pub enum Baud {
-    BAUD9600 = 9600,
-}
-
-impl Into<u32> for Baud {
-    fn into(self) -> u32 {
-        match self {
-            Baud::BAUD9600 => 9600,
-        }
-    }
-}
+use crate::baud::Baud;
 
 pub struct SerialHandler {
     port_handle: Box<dyn serialport::SerialPort>,

@@ -2,7 +2,7 @@ use eframe::{
     egui::{self, Layout},
     emath::Align,
 };
-use serialport;
+use serialport::{self, SerialPortInfo, SerialPortType};
 use strum::IntoEnumIterator;
 
 use crate::baud::Baud;
@@ -25,18 +25,18 @@ impl SerialSettingsPane {
         let mut available_ports = serialport::available_ports().unwrap();
 
         // Sort port list numerically
-        available_ports.sort_by_key(|p| {
-            p.port_name
-                .replace("COM", "")
-                .to_owned()
-                .parse::<i32>()
-                .unwrap()
-        });
+        available_ports.sort_by_key(|p| p.port_name.replace("COM", "").parse::<i32>().unwrap());
 
+        // Append device name to the combobox value
         let available_port_names: Vec<String> = available_ports
             .iter()
-            .map(|s| s.port_name.to_owned())
+            .map(|p| (p.port_name.clone() + " " + &self.get_usb_device_name(p)).to_string())
             .collect();
+
+        // let available_port_names: Vec<String> = available_ports
+        //     .iter()
+        //     .map(|s| s.port_name.to_owned())
+        //     .collect();
 
         // Get list of possible Baud Rates
         let baud_rates: Vec<_> = Baud::iter().collect();
@@ -76,5 +76,15 @@ impl SerialSettingsPane {
                 },
             );
         });
+    }
+
+    fn get_usb_device_name(&self, port_info: &SerialPortInfo) -> String {
+        match &port_info.port_type {
+            SerialPortType::UsbPort(usb_port_info) => match &usb_port_info.product {
+                Some(product_name) => product_name.to_owned(),
+                None => "".to_string(),
+            },
+            _ => "".to_string(),
+        }
     }
 }

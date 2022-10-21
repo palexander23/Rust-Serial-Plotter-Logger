@@ -11,6 +11,8 @@ mod main_window;
 mod multi_line;
 mod single_line;
 
+use baud::Baud;
+
 #[cfg(feature = "real-serial-comms")]
 mod serial_comms;
 
@@ -33,8 +35,7 @@ fn main() {
 
     // Spin off a separate thread that will add new points to the line
     #[cfg(feature = "real-serial-comms")]
-    let mut serial_handler =
-        serial_comms::SerialHandler::new("/dev/ttyACM0", serial_comms::Baud::BAUD9600);
+    let mut serial_handler = serial_comms::SerialHandler::new("/dev/ttyACM0", Baud::BAUD9600);
 
     #[cfg(feature = "fake-serial-comms")]
     let mut serial_handler = fake_serial_comms::FakeSerialHandler::new();

@@ -28,33 +28,35 @@ impl SerialSettingsPane {
         available_ports.sort_by_key(|p| p.port_name.replace("COM", "").parse::<i32>().unwrap());
 
         // Append device name to the combobox value
-        let available_port_names: Vec<String> = available_ports
+        let mut available_port_names: Vec<String> = available_ports
             .iter()
             .map(|p| (p.port_name.clone() + " " + &self.get_usb_device_name(p)).to_string())
             .collect();
 
-        // let available_port_names: Vec<String> = available_ports
-        //     .iter()
-        //     .map(|s| s.port_name.to_owned())
-        //     .collect();
+        // Give a default empty value to the port names combo box
+        if available_port_names.len() == 0 {
+            available_port_names.push(String::from("No Ports Available"));
+        }
 
         // Get list of possible Baud Rates
         let baud_rates: Vec<_> = Baud::iter().collect();
 
         ui.group(|ui| {
             ui.with_layout(
-                Layout::top_down(Align::LEFT).with_cross_justify(true),
+                Layout::top_down(Align::Center).with_cross_justify(true),
                 |ui| {
                     ui.heading("Serial Settings");
                     egui::Grid::new("Serial Settings Grid")
                         .num_columns(2)
                         .show(ui, |ui| {
+                            if available_port_names.len() > 0 {}
                             egui::ComboBox::from_label("Serial Port").show_index(
                                 ui,
                                 &mut self.selected_port_name_idx,
                                 available_port_names.len(),
                                 |i| available_port_names[i].to_owned(),
                             );
+
                             ui.end_row();
 
                             egui::ComboBox::from_label("Baud Rate").show_index(

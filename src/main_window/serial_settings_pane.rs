@@ -55,7 +55,7 @@ impl SerialSettingsPane {
 
         ui.group(|ui| {
             ui.with_layout(
-                Layout::top_down(Align::Center).with_cross_justify(true),
+                Layout::top_down(Align::LEFT).with_cross_justify(true),
                 |ui| {
                     ui.heading("Serial Settings");
                     egui::Grid::new("Serial Settings Grid")

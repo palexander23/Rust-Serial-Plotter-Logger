@@ -7,6 +7,14 @@ use strum::IntoEnumIterator;
 
 use crate::baud::Baud;
 
+#[derive(Default, Debug)]
+pub struct SerialSettingsPaneInfo {
+    selected_port_name: Option<String>,
+    selected_baud_rate: Baud,
+    start_clicked: bool,
+    stop_clicked: bool,
+}
+
 pub struct SerialSettingsPane {
     selected_port_name_idx: usize,
     selected_baud_rate_idx: usize,
@@ -20,7 +28,11 @@ impl SerialSettingsPane {
         }
     }
 
-    pub fn update(&mut self, ui: &mut egui::Ui) {
+    pub fn update(&mut self, ui: &mut egui::Ui) -> SerialSettingsPaneInfo {
+        // Define an object in which to store in the useful data from this pane
+        // Returned at the end of the update
+        let mut pane_info = SerialSettingsPaneInfo::default();
+
         // Get list of available serial port names
         let mut available_ports = serialport::available_ports().unwrap();
 
@@ -57,6 +69,13 @@ impl SerialSettingsPane {
                                 |i| available_port_names[i].to_owned(),
                             );
 
+                            if available_ports.len() == 0 {
+                                pane_info.selected_port_name = None;
+                            } else {
+                                pane_info.selected_port_name =
+                                    Some(available_port_names[self.selected_port_name_idx].clone());
+                            }
+
                             ui.end_row();
 
                             egui::ComboBox::from_label("Baud Rate").show_index(
@@ -65,19 +84,24 @@ impl SerialSettingsPane {
                                 baud_rates.len(),
                                 |i| baud_rates[i].into(),
                             );
+
+                            pane_info.selected_baud_rate = baud_rates[self.selected_baud_rate_idx];
+
                             ui.end_row();
                         });
 
                     ui.with_layout(
                         Layout::left_to_right(Align::Center).with_main_align(Align::Center),
                         |ui| {
-                            ui.button("Start");
-                            ui.button("Stop");
+                            pane_info.start_clicked = ui.button("Start").clicked();
+                            pane_info.stop_clicked = ui.button("Stop").clicked();
                         },
                     );
                 },
             );
         });
+
+        return pane_info;
     }
 
     fn get_usb_device_name(&self, port_info: &SerialPortInfo) -> String {

@@ -1,6 +1,6 @@
 use strum::EnumIter;
 
-#[derive(Debug, EnumIter, Clone, Copy)]
+#[derive(Default, Debug, EnumIter, Clone, Copy)]
 pub enum Baud {
     BAUD110 = 110,
     BAUD300 = 300,
@@ -13,6 +13,7 @@ pub enum Baud {
     BAUD19200 = 19200,
     BAUD38400 = 38400,
     BAUD57600 = 57600,
+    #[default]
     BAUD115200 = 115200,
     BAUD128000 = 128000,
     BAUD256000 = 256000,

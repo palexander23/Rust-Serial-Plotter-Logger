@@ -1,12 +1,11 @@
 use std::collections::VecDeque;
 
 use eframe::egui;
-
-pub type DataPoint = eframe::egui::plot::Value;
+use eframe::egui::plot::PlotPoint;
 
 #[derive(Debug)]
 pub struct SerialDataSingleLine {
-    line: VecDeque<DataPoint>,
+    line: VecDeque<PlotPoint>,
 }
 
 impl SerialDataSingleLine {
@@ -19,7 +18,7 @@ impl SerialDataSingleLine {
 
     pub fn add_val(&mut self, val: i64, x_counter: i32) {
         // Construct a new x,y point.
-        let new_point = DataPoint::new(x_counter as f64, val as f64);
+        let new_point = PlotPoint::new(x_counter as f64, val as f64);
 
         // Add the new value to the set of points.
         self.line.push_back(new_point);
@@ -44,11 +43,11 @@ impl SerialDataSingleLine {
         self.line = VecDeque::new();
     }
 
-    pub fn get_plot_values(&self) -> egui::plot::Values {
-        egui::plot::Values::from_values_iter(self.line.iter().copied())
+    pub fn get_plot_values(&self) -> egui::plot::PlotPoints {
+        self.line.iter().copied().map(|p| [p.x, p.y]).collect()
     }
 
-    pub fn get_vec(&self) -> Vec<(f64, f64)> {
+    pub fn _get_vec(&self) -> Vec<(f64, f64)> {
         self.line.iter().map(|v| (v.x, v.y)).collect()
     }
 }
@@ -74,7 +73,7 @@ mod test {
 
         assert_eq!(
             test_instance.line,
-            vec![DataPoint::new(0, 5), DataPoint::new(1, 10),]
+            vec![PlotPoint::new(0, 5), PlotPoint::new(1, 10),]
         );
     }
 

@@ -2,6 +2,8 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
 use std::{thread, time::Duration};
 
 use tracing::{info, warn, Level};
@@ -27,11 +29,11 @@ fn main() {
 
     info!("Starting app...");
 
-    // Create an instance of the plot window
-    let main_win = main_window::MainWindow::new();
+    // Define channels for communication with the GUI thread
+    let (serial_data_tx, serial_data_rx): (Sender<String>, Receiver<String>) = mpsc::channel();
 
-    // Extract a pointer to the line data storage object
-    let line_data_ref = main_win.plot_pane.lines.clone();
+    // Create an instance of the plot window
+    let main_win = main_window::MainWindow::new(serial_data_rx);
 
     // Spin off a separate thread that will add new points to the line
     #[cfg(feature = "real-serial-comms")]
@@ -41,9 +43,8 @@ fn main() {
     let mut serial_handler = fake_serial_comms::FakeSerialHandler::new();
 
     thread::spawn(move || loop {
-        match serial_handler.process_serial_data() {
-            Some(new_str) => line_data_ref.lock().unwrap().add_new_data(new_str.as_str()),
-            None => (),
+        if let Some(new_str) = serial_handler.process_serial_data() {
+            serial_data_tx.send(new_str.to_string()).unwrap();
         }
 
         std::thread::sleep(Duration::from_millis(10));

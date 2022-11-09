@@ -1,3 +1,6 @@
+use std::sync::mpsc::Receiver;
+use std::time::Duration;
+
 use eframe::egui::{self, CentralPanel};
 use egui_extras::{Size, StripBuilder};
 
@@ -17,21 +20,30 @@ pub struct MainWindow {
     pub plot_settings_pane: PlotSettingsPane,
     pub serial_settings_pane: SerialSettingsPane,
     pub log_settings_pane: LogSettingsPane,
+
+    serial_data_rx: Receiver<String>,
 }
 
 impl MainWindow {
-    pub fn new() -> Self {
+    pub fn new(serial_data_rx: Receiver<String>) -> Self {
         Self {
             plot_pane: PlotPane::new(),
             plot_settings_pane: PlotSettingsPane::new(),
             serial_settings_pane: SerialSettingsPane::new(),
             log_settings_pane: LogSettingsPane::new(),
+            serial_data_rx,
         }
     }
 }
 
 impl eframe::App for MainWindow {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // Update the plot window with any new serial data.
+        // Give it a timeout of zero so it is non-blocking.
+        if let Ok(new_str) = self.serial_data_rx.recv_timeout(Duration::from_millis(0)) {
+            self.plot_pane.lines.add_new_data(new_str.as_str())
+        }
+
         // Define central display area for MainWindow
         CentralPanel::default().show(ctx, |ui| {
             StripBuilder::new(ui)

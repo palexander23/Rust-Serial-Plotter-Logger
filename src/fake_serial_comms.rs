@@ -39,6 +39,10 @@ impl FakeSerialHandler {
     }
 }
 
+pub fn get_available_port_names() -> Option<Vec<String>> {
+    Some(vec!["Fake Port".to_string()])
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

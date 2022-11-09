@@ -1,4 +1,4 @@
-use serialport::SerialPort;
+use serialport::{SerialPort, SerialPortInfo, SerialPortType};
 use std::io::ErrorKind;
 use std::time::Duration;
 use tracing::{debug, error};
@@ -64,5 +64,36 @@ impl SerialHandler {
         self.in_buffer.drain(0..=line_ending_idx);
 
         Some(new_line_str)
+    }
+}
+
+pub fn get_available_port_names() -> Option<Vec<String>> {
+    // Get list of available serial port names
+    let mut available_ports = serialport::available_ports().unwrap();
+
+    // If no ports exist, return here
+    if available_ports.len() == 0 {
+        return None;
+    }
+
+    // Sort port list numerically
+    available_ports.sort_by_key(|p| p.port_name.replace("COM", "").parse::<i32>().unwrap());
+
+    // Append device name to the combobox value
+    let available_port_names: Vec<String> = available_ports
+        .iter()
+        .map(|p| (p.port_name.clone() + " " + &get_usb_device_name(p)))
+        .collect();
+
+    return Some(available_port_names);
+}
+
+fn get_usb_device_name(port_info: &SerialPortInfo) -> String {
+    match &port_info.port_type {
+        SerialPortType::UsbPort(usb_port_info) => match &usb_port_info.product {
+            Some(product_name) => product_name.to_owned(),
+            None => "".to_string(),
+        },
+        _ => "".to_string(),
     }
 }

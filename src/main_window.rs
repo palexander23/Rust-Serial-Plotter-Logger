@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use eframe::egui::{self, CentralPanel};
 use egui_extras::{Size, StripBuilder};
+use tracing::info;
 
 pub(crate) mod plot_pane;
 
@@ -78,8 +79,14 @@ impl eframe::App for MainWindow {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Update the plot window with any new serial data.
         // Give it a timeout of zero so it is non-blocking.
-        if let Ok(new_str) = self.serial_data_rx.recv_timeout(Duration::from_millis(0)) {
-            self.plot_pane.lines.add_new_data(new_str.as_str())
+        // Loop until all data has been collected
+        info!("New Window Draw");
+        loop {
+            if let Ok(new_str) = self.serial_data_rx.recv_timeout(Duration::from_millis(0)) {
+                self.plot_pane.lines.add_new_data(new_str.as_str());
+            } else {
+                break;
+            }
         }
 
         // Define central display area for MainWindow

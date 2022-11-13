@@ -32,16 +32,21 @@ fn main() {
     // Define channels for communication with the GUI thread
     let (serial_data_tx, serial_data_rx): (Sender<String>, Receiver<String>) = mpsc::channel();
 
-    // Create an instance of the plot window
-    let main_win = main_window::MainWindow::new(serial_data_rx);
+    // Start Up the egui thread and backend thread.
+    // The respective channels are passed in.
+    run_backend_thread(serial_data_tx);
+    run_egui_thread(serial_data_rx);
+}
 
-    // Spin off a separate thread that will add new points to the line
+fn run_backend_thread(serial_data_tx: Sender<String>) {
+    // Initialize the serial interface
     #[cfg(feature = "real-serial-comms")]
     let mut serial_handler = serial_comms::SerialHandler::new("/dev/ttyACM0", Baud::BAUD9600);
 
     #[cfg(feature = "fake-serial-comms")]
     let mut serial_handler = fake_serial_comms::FakeSerialHandler::new();
 
+    // Spin the backend thread off on its own
     thread::spawn(move || loop {
         if let Some(new_str) = serial_handler.process_serial_data() {
             serial_data_tx.send(new_str.to_string()).unwrap();
@@ -49,6 +54,11 @@ fn main() {
 
         std::thread::sleep(Duration::from_millis(10));
     });
+}
+
+fn run_egui_thread(serial_data_rx: Receiver<String>) {
+    // Create an instance of the plot window
+    let main_win = main_window::MainWindow::new(serial_data_rx);
 
     // Start the egui thread.
     // The program will not return from this!

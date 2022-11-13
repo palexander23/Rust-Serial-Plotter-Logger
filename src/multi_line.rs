@@ -42,16 +42,28 @@ impl SerialDataMultiLine {
 
         // Trim each tocken and remove any empty tokens
         // TODO: Remove all non-numerical characters from each token
-        let new_vals: Vec<i32> = str_tokens
+        let mut received_damaged_data = false;
+        let new_vals: Vec<Option<i32>> = str_tokens
             .iter()
             .map(|s| s.trim())
             .filter(|s| s != &"")
-            .map(|s| s.parse().expect("Could not parse!"))
+            .map(|s| {
+                if let Ok(num) = s.parse::<i32>() {
+                    Some(num)
+                } else {
+                    received_damaged_data = true;
+                    None
+                }
+            })
             .collect();
+
+        if received_damaged_data == true {
+            return;
+        }
 
         // Place the parsed numbers into the respective line
         for (idx, val) in new_vals.iter().enumerate() {
-            self.line_vec[idx].add_val(val.clone() as i64, self.x_counter);
+            self.line_vec[idx].add_val(val.unwrap().clone() as i64, self.x_counter);
         }
 
         // Prune the values in each line that have fallen behind the x look back.

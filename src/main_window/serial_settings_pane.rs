@@ -13,10 +13,10 @@ use crate::serial_comms::get_available_port_names;
 
 #[derive(Default, Debug)]
 pub struct SerialSettingsPaneInfo {
-    selected_port_name: Option<String>,
-    selected_baud_rate: Baud,
-    start_clicked: bool,
-    stop_clicked: bool,
+    pub selected_port_name: Option<String>,
+    pub selected_baud_rate: Baud,
+    pub start_clicked: bool,
+    pub stop_clicked: bool,
 }
 
 pub struct SerialSettingsPane {

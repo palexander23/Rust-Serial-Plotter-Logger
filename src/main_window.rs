@@ -3,7 +3,6 @@ use std::time::Duration;
 
 use eframe::egui::{self, CentralPanel};
 use egui_extras::{Size, StripBuilder};
-use tracing::info;
 
 pub(crate) mod plot_pane;
 
@@ -80,10 +79,10 @@ impl eframe::App for MainWindow {
         // Update the plot window with any new serial data.
         // Give it a timeout of zero so it is non-blocking.
         // Loop until all data has been collected
-        info!("New Window Draw");
         loop {
             if let Ok(new_str) = self.serial_data_rx.recv_timeout(Duration::from_millis(0)) {
                 self.plot_pane.lines.add_new_data(new_str.as_str());
+                ctx.request_repaint();
             } else {
                 break;
             }
@@ -128,8 +127,8 @@ impl eframe::App for MainWindow {
                         });
                     });
                 });
-        });
 
-        ctx.request_repaint();
+            ctx.request_repaint_after(Duration::from_secs(1))
+        });
     }
 }

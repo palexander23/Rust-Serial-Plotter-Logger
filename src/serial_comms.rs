@@ -67,7 +67,7 @@ impl SerialHandler {
     }
 }
 
-pub fn get_available_port_names() -> Option<Vec<String>> {
+pub fn get_available_port_names() -> Option<(Vec<String>, Vec<String>)> {
     // Get list of available serial port names
     let mut available_ports = serialport::available_ports().unwrap();
 
@@ -82,10 +82,15 @@ pub fn get_available_port_names() -> Option<Vec<String>> {
     // Append device name to the combobox value
     let available_port_names: Vec<String> = available_ports
         .iter()
-        .map(|p| (p.port_name.clone() + " " + &get_usb_device_name(p)))
+        .map(|p| p.port_name.clone())
         .collect();
 
-    return Some(available_port_names);
+    let available_port_details: Vec<String> = available_ports
+        .iter()
+        .map(|p| p.port_name.clone() + " " + &get_usb_device_name(p))
+        .collect();
+
+    return Some((available_port_names, available_port_details));
 }
 
 fn get_usb_device_name(port_info: &SerialPortInfo) -> String {

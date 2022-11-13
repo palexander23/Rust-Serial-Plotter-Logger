@@ -13,8 +13,6 @@ mod main_window;
 mod multi_line;
 mod single_line;
 
-use baud::Baud;
-
 use crate::main_window::gui_event_types::GuiEvent;
 
 #[cfg(feature = "real-serial-comms")]
@@ -74,8 +72,6 @@ fn run_backend_thread(serial_data_tx: Sender<String>, gui_events_rx: Receiver<Gu
                         break;
                     }
                 }
-
-                std::thread::sleep(Duration::from_millis(10));
             }
         }
     });

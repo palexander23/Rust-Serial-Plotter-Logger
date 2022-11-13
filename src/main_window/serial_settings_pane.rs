@@ -42,12 +42,15 @@ impl SerialSettingsPane {
         // This will be shown in the ComboBox but None will be returned as the selected port.
         // TODO: Make the display of no available ports more elegant.
         let available_port_names: Vec<String>;
+        let available_port_details: Vec<String>;
         let ports_available: bool;
-        if let Some(port_names_vec) = get_available_port_names() {
+        if let Some((port_names_vec, port_details_vec)) = get_available_port_names() {
             available_port_names = port_names_vec;
+            available_port_details = port_details_vec;
             ports_available = true;
         } else {
             available_port_names = vec!["No Ports Available".to_string()];
+            available_port_details = vec!["No Ports Available".to_string()];
             ports_available = false;
         }
 
@@ -65,8 +68,8 @@ impl SerialSettingsPane {
                             egui::ComboBox::from_label("Serial Port").show_index(
                                 ui,
                                 &mut self.selected_port_name_idx,
-                                available_port_names.len(),
-                                |i| available_port_names[i].to_owned(),
+                                available_port_details.len(),
+                                |i| available_port_details[i].to_owned(),
                             );
 
                             ui.end_row();

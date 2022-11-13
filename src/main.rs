@@ -2,10 +2,12 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
+use std::io;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use std::{thread, time::Duration};
 
+use serialport::ErrorKind;
 use tracing::{debug, info, warn, Level};
 
 mod baud;
@@ -60,9 +62,17 @@ fn run_backend_thread(serial_data_tx: Sender<String>, gui_events_rx: Receiver<Gu
             let mut serial_handler = fake_serial_comms::FakeSerialHandler::new();
 
             loop {
-                // If new serial data has arrived send it to the Guij
-                if let Some(new_str) = serial_handler.process_serial_data() {
-                    serial_data_tx.send(new_str.to_string()).unwrap();
+                // If new serial data has arrived send it to the Gui
+                // If the serial port has errored out end the loop
+                match serial_handler.process_serial_data() {
+                    Ok(Some(new_str)) => serial_data_tx.send(new_str.to_string()).unwrap(),
+                    Err(ref e) => {
+                        if e.kind() != ErrorKind::Io(io::ErrorKind::TimedOut) {
+                            warn!("Serial Connection Severed Unexpectedly!");
+                            break;
+                        }
+                    }
+                    _ => (),
                 }
 
                 // If the gui has been told to stop the serial port break the loop

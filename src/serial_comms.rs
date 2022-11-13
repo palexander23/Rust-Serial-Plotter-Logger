@@ -1,7 +1,6 @@
-use serialport::{SerialPort, SerialPortInfo, SerialPortType};
-use std::io::ErrorKind;
+use serialport::{Error, SerialPort, SerialPortInfo, SerialPortType};
 use std::time::Duration;
-use tracing::{debug, error};
+use tracing::debug;
 
 use crate::baud::Baud;
 
@@ -28,18 +27,13 @@ impl SerialHandler {
         }
     }
 
-    pub fn process_serial_data(&mut self) -> Option<String> {
+    pub fn process_serial_data(&mut self) -> Result<Option<String>, Error> {
         let mut read_buf: Vec<u8> = vec![0; 512];
-        let mut bytes_read = 0;
 
-        match self.port_handle.read(read_buf.as_mut_slice()) {
-            Ok(t) => bytes_read = t,
-            Err(ref e) if e.kind() == ErrorKind::TimedOut => return None,
-            Err(e) => error!("Could not read serial! {:?}", e),
-        }
+        let bytes_read = self.port_handle.read(read_buf.as_mut_slice())?;
 
         if bytes_read == 0 {
-            return None;
+            return Ok(None);
         }
 
         let in_slice = &read_buf[0..bytes_read];
@@ -48,7 +42,7 @@ impl SerialHandler {
         self.in_buffer.append(&mut in_chars.clone());
 
         if !in_chars.contains(&'\n') {
-            return None;
+            return Ok(None);
         }
 
         let line_ending_idx = self
@@ -63,7 +57,7 @@ impl SerialHandler {
 
         self.in_buffer.drain(0..=line_ending_idx);
 
-        Some(new_line_str)
+        Ok(Some(new_line_str))
     }
 }
 

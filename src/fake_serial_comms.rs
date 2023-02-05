@@ -41,10 +41,7 @@ impl FakeSerialHandler {
 }
 
 pub fn get_available_port_names() -> Option<(Vec<String>, Vec<String>)> {
-    Some((
-        vec!["Fake Port".to_string()],
-        vec!["A fake port producing fake data".to_string()],
-    ))
+    Some((vec!["Fake Port".to_string()], vec!["Fake Port".to_string()]))
 }
 
 #[cfg(test)]

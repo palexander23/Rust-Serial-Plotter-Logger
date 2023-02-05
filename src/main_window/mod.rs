@@ -82,7 +82,6 @@ impl eframe::App for MainWindow {
         loop {
             if let Ok(new_str) = self.serial_data_rx.recv_timeout(Duration::from_millis(0)) {
                 self.plot_pane.lines.add_new_data(new_str.as_str());
-                ctx.request_repaint();
             } else {
                 break;
             }
@@ -128,7 +127,7 @@ impl eframe::App for MainWindow {
                     });
                 });
 
-            ctx.request_repaint_after(Duration::from_secs(1))
+            ctx.request_repaint_after(Duration::from_millis(50))
         });
     }
 }

@@ -1,5 +1,6 @@
 use serialport::Error;
 use std::num::Wrapping;
+use std::{thread, time::Duration};
 
 pub struct FakeSerialHandler {
     line_val_vec: Vec<Wrapping<i8>>,
@@ -20,6 +21,9 @@ impl FakeSerialHandler {
             self.read_counter += 1;
             return Ok(None);
         }
+
+        // Add some delay to mimic the real system
+        thread::sleep(Duration::from_millis(50));
 
         // Format the stored vector of strings into a string
         let fake_serial_str: String = self

@@ -1,3 +1,4 @@
+use serialport::Error;
 use std::num::Wrapping;
 
 pub struct FakeSerialHandler {
@@ -13,11 +14,11 @@ impl FakeSerialHandler {
         }
     }
 
-    pub fn process_serial_data(&mut self) -> Option<String> {
+    pub fn process_serial_data(&mut self) -> Result<Option<String>, Error> {
         // If the line has been read recently don't give any more data
         if self.read_counter < 4 {
             self.read_counter += 1;
-            return None;
+            return Ok(None);
         }
 
         // Format the stored vector of strings into a string
@@ -35,12 +36,15 @@ impl FakeSerialHandler {
         self.line_val_vec = self.line_val_vec.iter().map(|v| v + Wrapping(1)).collect();
 
         // Return the fake serial string
-        Some(fake_serial_str)
+        Ok(Some(fake_serial_str))
     }
 }
 
-pub fn get_available_port_names() -> Option<Vec<String>> {
-    Some(vec!["Fake Port".to_string()])
+pub fn get_available_port_names() -> Option<(Vec<String>, Vec<String>)> {
+    Some((
+        vec!["Fake Port".to_string()],
+        vec!["A fake port producing fake data".to_string()],
+    ))
 }
 
 #[cfg(test)]

@@ -1,4 +1,6 @@
+use serialport::Error;
 use std::num::Wrapping;
+use std::{thread, time::Duration};
 
 pub struct FakeSerialHandler {
     line_val_vec: Vec<Wrapping<i8>>,
@@ -13,12 +15,15 @@ impl FakeSerialHandler {
         }
     }
 
-    pub fn process_serial_data(&mut self) -> Option<String> {
+    pub fn process_serial_data(&mut self) -> Result<Option<String>, Error> {
         // If the line has been read recently don't give any more data
         if self.read_counter < 4 {
             self.read_counter += 1;
-            return None;
+            return Ok(None);
         }
+
+        // Add some delay to mimic the real system
+        thread::sleep(Duration::from_millis(50));
 
         // Format the stored vector of strings into a string
         let fake_serial_str: String = self
@@ -35,8 +40,12 @@ impl FakeSerialHandler {
         self.line_val_vec = self.line_val_vec.iter().map(|v| v + Wrapping(1)).collect();
 
         // Return the fake serial string
-        Some(fake_serial_str)
+        Ok(Some(fake_serial_str))
     }
+}
+
+pub fn get_available_port_names() -> Option<(Vec<String>, Vec<String>)> {
+    Some((vec!["Fake Port".to_string()], vec!["Fake Port".to_string()]))
 }
 
 #[cfg(test)]

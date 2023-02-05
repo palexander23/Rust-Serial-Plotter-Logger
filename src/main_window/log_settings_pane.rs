@@ -41,8 +41,8 @@ impl LogSettingsPane {
                     ui.with_layout(
                         Layout::left_to_right(Align::Center).with_main_align(Align::Center),
                         |ui| {
-                            ui.button("Start");
-                            ui.button("Stop");
+                            ui.button("Start").clicked();
+                            ui.button("Stop").clicked();
                         },
                     );
                 },
